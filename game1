@@ -1,0 +1,23 @@
+---
+:word: 'oregon
+
+'
+:attempts: 6
+:incorrect_letters:
+- a
+- i
+- s
+- y
+:output_word:
+- o
+- r
+- e
+- _
+- o
+- _
+:guessed_correctly: true
+:indexes_already_taken:
+- 2
+- 0
+- 4
+- 1

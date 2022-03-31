@@ -27,11 +27,11 @@ class Game
     end
 
     def try_to_guess
-        splited_word = @word.split("")
+        splitted_word = @word.chomp.split("")
         puts "select a new letter"
         selected_letter = gets.chomp.downcase
-        if splited_word.include?(selected_letter)
-            splited_word.each_with_index do |value, index|
+        if splitted_word.include?(selected_letter)
+            splitted_word.each_with_index do |value, index|
                 if @indexes_already_taken.include?(index)
                     next
                 elsif selected_letter == value
@@ -69,7 +69,7 @@ class Game
             try_to_guess
             if !@guessed_correctly
                 @attempts -= 1
-            elsif @indexes_already_taken.length == @word.length
+            elsif @output_word.join == @word
                 puts "Yeeeey you guessed correctly, congrats"
                 break
             end
@@ -89,6 +89,10 @@ class Game
         load_dictionary
         select_word(@dictionary)
         while @attempts > 0 do
+            if @output_word.join == @word
+                puts "Yeeeey you guessed correctly, congrats"
+                break
+            end
             if @attempts < 10 
                 puts "do you want to save the game? y/n"
                 user_wanna_save = gets.chomp.downcase
@@ -101,9 +105,6 @@ class Game
             try_to_guess
             if !@guessed_correctly
                 @attempts -= 1
-            elsif @indexes_already_taken.length == @word.length
-                puts "Yeeeey you guessed correctly, congrats"
-                break
             end
         end
         if @attempts == 0 
