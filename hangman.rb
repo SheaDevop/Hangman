@@ -1,5 +1,13 @@
+require 'yaml'
+
 class Game
-    def initialize 
+    def initialize(word = nil, attempts = nil, incorrect_letters = [nil], output_word = [nil], guessed_correctly = nil, indexes_already_taken = [nil])
+        @word = word
+        @attempts = attempts
+        @incorrect_letters = incorrect_letters
+        @output_word = output_word
+        @guessed_correctly = guessed_correctly
+        @indexes_already_taken = indexes_already_taken
     end
 
     def load_dictionary
@@ -43,29 +51,97 @@ class Game
     end
     
     def play
-        attempts = 10
+        puts "to play a new game enter the keyword 'new', to load an existing game, enter the keyword 'load'"
+        @option = gets.chomp.downcase
+        if @option == "new"
+            play_new_game
+        elsif @option == "load"
+            puts "enter the saved game name"
+            file_name = gets.chomp
+            load_game(file_name)
+        else
+            puts "invalid keyword"
+        end
+    end
+
+    def play_loaded
+        while @attempts > 0 do
+            try_to_guess
+            if !@guessed_correctly
+                @attempts -= 1
+            elsif @indexes_already_taken.length == @word.length
+                puts "Yeeeey you guessed correctly, congrats"
+                break
+            end
+        end
+        if @attempts == 0 
+            puts "Game Over"
+            puts "the word was #{@word}"
+        end
+    end
+
+    def play_new_game
+        @attempts = 10
         @incorrect_letters = []
         @output_word = []
         @guessed_correctly = false
         @indexes_already_taken = []
         load_dictionary
         select_word(@dictionary)
-        while attempts > 0 do
+        while @attempts > 0 do
+            if @attempts < 10 
+                puts "do you want to save the game? y/n"
+                user_wanna_save = gets.chomp.downcase
+                if user_wanna_save == "y"
+                    puts "select a name for your game"
+                    game_name = gets.chomp
+                    save_game(game_name)
+                end
+            end
             try_to_guess
             if !@guessed_correctly
-                attempts -= 1
+                @attempts -= 1
             elsif @indexes_already_taken.length == @word.length
                 puts "Yeeeey you guessed correctly, congrats"
                 break
             end
         end
-        if attempts == 0 
+        if @attempts == 0 
             puts "Game Over"
             puts "the word was #{@word}"
         end
     end
+
+    def to_yaml
+        YAML.dump ({
+            :word => @word,
+            :attempts => @attempts,
+            :incorrect_letters => @incorrect_letters,
+            :output_word => @output_word,
+            :guessed_correctly => @guessed_correctly,
+            :indexes_already_taken => @indexes_already_taken
+        })
+    end
+
+    def self.from_yaml(string)
+        data = YAML.load string
+        self.new(data[:word], data[:attempts], data[:incorrect_letters], data[:output_word], data[:guessed_correctly], data[:indexes_already_taken])
+    end
+
+    def save_game(game_name)
+        game_file = File.open(game_name, "w")
+        game_file.write to_yaml
+        game_file.close
+    end
+
+    def load_game(game_file)
+        file = File.open(game_file, "r")
+        game_data = file.read 
+        game_name = Game.from_yaml(game_data)
+        game_name.play_loaded
+    end
 end
 
-game_1 = Game.new
-game_1.play
+nachos_game = Game.new
+nachos_game.play
 
