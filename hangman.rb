@@ -143,14 +143,3 @@ class Game
         game_name.play_loaded
     end
 end
-
-nachos_game = Game.new
-nachos_game.play
-
-def player_has_won?
-    word_guessed_state = @output_word.join
-    if word_guessed_state == @word
-        puts "Yeeeey you guessed correctly, congrats"
-        return true
-    end
-end
