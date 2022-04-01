@@ -49,6 +49,14 @@ class Game
         p @output_word
         puts "the incorrect letters you have choosen are #{@incorrect_letters}"
     end
+
+    def player_has_won?
+        word_guessed_state = @output_word.join
+        if word_guessed_state == @word.chomp
+            puts "Yeeeey you guessed correctly, congrats"
+            return true
+        end
+    end
     
     def play
         puts "to play a new game enter the keyword 'new', to load an existing game, enter the keyword 'load'"
@@ -66,12 +74,9 @@ class Game
 
     def play_loaded
         while @attempts > 0 do
-            try_to_guess
+            player_has_won? ? break : try_to_guess
             if !@guessed_correctly
                 @attempts -= 1
-            elsif @output_word.join == @word
-                puts "Yeeeey you guessed correctly, congrats"
-                break
             end
         end
         if @attempts == 0 
@@ -89,10 +94,6 @@ class Game
         load_dictionary
         select_word(@dictionary)
         while @attempts > 0 do
-            if @output_word.join == @word
-                puts "Yeeeey you guessed correctly, congrats"
-                break
-            end
             if @attempts < 10 
                 puts "do you want to save the game? y/n"
                 user_wanna_save = gets.chomp.downcase
@@ -102,7 +103,7 @@ class Game
                     save_game(game_name)
                 end
             end
-            try_to_guess
+            player_has_won? ? break : try_to_guess
             if !@guessed_correctly
                 @attempts -= 1
             end
@@ -146,3 +147,10 @@ end
 nachos_game = Game.new
 nachos_game.play
 
+def player_has_won?
+    word_guessed_state = @output_word.join
+    if word_guessed_state == @word
+        puts "Yeeeey you guessed correctly, congrats"
+        return true
+    end
+end
